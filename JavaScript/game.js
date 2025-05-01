@@ -6,6 +6,13 @@ export function initGame(scene, camera) {
     camera.position.set(0, 10, 10);
     camera.lookAt(frog.position);
 
+    let jumping = false; 
+    
+    const jumpDuration = 0.1; // Duração do salto em segundos
+    const jumpHeight = 1; // Altura do salto em unidades de jogo
+    const jumpDistance = 1; // Distância do salto em unidades de jogo
+
+
     const cars = [];
     for (let i = 0; i < 5; i++) {
         const car = createCar();
@@ -18,38 +25,49 @@ export function initGame(scene, camera) {
         let targetX = frog.position.x;
         let targetZ = frog.position.z;
         let rotation = frog.rotation.y;
+         
+        if (event.repeat) return;
+        if (jumping) return; // Ignora se já estiver a saltar
 
         switch (event.key) {
             case 'ArrowUp':
-                targetZ -= 1;
+                targetZ -= jumpDistance;
                 rotation = 0;
+                jumping = true;
                 break;
             case 'ArrowDown':
-                targetZ += 1;
+                targetZ += jumpDistance;
                 rotation = Math.PI;
+                jumping = true;
                 break;
             case 'ArrowLeft':
-                targetX -= 1;
+                targetX -= jumpDistance;
                 rotation = Math.PI / 2;
+                jumping = true;
                 break;
             case 'ArrowRight':
-                targetX += 1;
+                targetX += jumpDistance;
                 rotation = -Math.PI / 2;
+                jumping = true;
                 break;
             default:
                 return; // Ignora outras teclas
         }
 
         frog.rotation.y = rotation;
+        
+        if (!jumping) {
+            return;
+        }
 
-        // Anima��o do salto com GSAP
+        // Animação do salto com GSAP
         gsap.to(frog.position, {
-            duration: 0.2,
-            y: 1,
+            duration: jumpDuration/2,
+            y: jumpHeight,
             ease: "power2.out",
             onComplete: () => {
                 gsap.to(frog.position, {
-                    duration: 0.2,
+                    duration: jumpDuration/2,
                     y: 0,
                     ease: "bounce.out"
                 });
@@ -58,10 +76,13 @@ export function initGame(scene, camera) {
 
         // Movimento horizontal e longitudinal durante o salto
         gsap.to(frog.position, {
-            duration: 0.4,
+            duration: jumpDuration,
             x: targetX,
             z: targetZ,
-            ease: "power1.inOut"
+            ease: "power1.inOut",
+            onComplete: () => {
+                jumping = false; // Permite saltar novamente
+            }
         });
     });
 }
