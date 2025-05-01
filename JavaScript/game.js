@@ -1,5 +1,4 @@
 import { createFrog, createCar, createLog } from './objects.js';
-import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js';
 
 export function initGame(scene, camera) {
     const frog = createFrog();
@@ -16,21 +15,53 @@ export function initGame(scene, camera) {
     }
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'ArrowUp') {
-            frog.position.z -= 1;
-            frog.lookAt(frog.position, frog.position+new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, 1, 0));
+        let targetX = frog.position.x;
+        let targetZ = frog.position.z;
+        let rotation = frog.rotation.y;
+
+        switch (event.key) {
+            case 'ArrowUp':
+                targetZ -= 1;
+                rotation = 0;
+                break;
+            case 'ArrowDown':
+                targetZ += 1;
+                rotation = Math.PI;
+                break;
+            case 'ArrowLeft':
+                targetX -= 1;
+                rotation = Math.PI / 2;
+                break;
+            case 'ArrowRight':
+                targetX += 1;
+                rotation = -Math.PI / 2;
+                break;
+            default:
+                return; // Ignora outras teclas
         }
-        if (event.key === 'ArrowDown') {
-            frog.position.z += 1;
-            frog.lookAt(frog.position, frog.position+new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 1, 0));
-        }
-        if (event.key === 'ArrowLeft') {
-            frog.position.x -= 1;
-            frog.lookAt(frog.position, frog.position+new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, 1, 0));
-        }
-        if (event.key === 'ArrowRight') {
-            frog.position.x += 1;
-            frog.lookAt(frog.position, frog.position+new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0));
-        }
+
+        frog.rotation.y = rotation;
+
+        // Animação do salto com GSAP
+        gsap.to(frog.position, {
+            duration: 0.2,
+            y: 1,
+            ease: "power2.out",
+            onComplete: () => {
+                gsap.to(frog.position, {
+                    duration: 0.2,
+                    y: 0,
+                    ease: "bounce.out"
+                });
+            }
+        });
+
+        // Movimento horizontal e longitudinal durante o salto
+        gsap.to(frog.position, {
+            duration: 0.4,
+            x: targetX,
+            z: targetZ,
+            ease: "power1.inOut"
+        });
     });
 }

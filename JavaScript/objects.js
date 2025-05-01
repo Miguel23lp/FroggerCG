@@ -2,28 +2,50 @@ import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/thr
 
 export function createFrog() {
     const group = new THREE.Group();
+
     // Body
-    const bodyGeometry = new THREE.BoxGeometry(1, 1, 1);
-    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+    const bodyGeometry = new THREE.BoxGeometry(1, 0.6, 1);
+    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 }); // Verde mais "realista"
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    body.position.set(0, 0.5, 0);
+    body.position.set(0, 0.3, 0);
     group.add(body);
+
     // Head
-    const headGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-    const headMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-    const head = new THREE.Mesh(headGeometry, headMaterial);
-    head.position.set(0, 1.25, -0.25);
+    const headGeometry = new THREE.BoxGeometry(0.6, 0.4, 0.6);
+    const head = new THREE.Mesh(headGeometry, bodyMaterial);
+    head.position.set(0, 0.5, -0.6);
     group.add(head);
 
-    // Legs
-    const legGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-    const legMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-    const leg1 = new THREE.Mesh(legGeometry, legMaterial);
-    leg1.position.set(-0.6, 0.1, -0.25);
-    const leg2 = new THREE.Mesh(legGeometry, legMaterial);
-    leg2.position.set(0.6, 0.1, -0.25);
-    group.add(leg1, leg2);
+    // Eyes
+    const eyeGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+    const eyeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const pupilMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
 
+    for (let i of [-0.2, 0.2]) {
+        const eye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        eye.position.set(i, 0.7, -0.8);
+        group.add(eye);
+
+        const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 16), pupilMaterial);
+        pupil.position.set(i, 0.7, -0.85);
+        group.add(pupil);
+    }
+
+    // Legs
+    const legGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.6);
+    for (let i of [-0.4, 0.4]) {
+        const leg = new THREE.Mesh(legGeometry, bodyMaterial);
+        leg.position.set(i, 0.15, 0.5);
+        group.add(leg);
+    }
+
+    // feet
+    const footGeometry = new THREE.BoxGeometry(0.2, 0.1, 0.4);
+    for (let i of [-0.3, 0.3]) {
+        const foot = new THREE.Mesh(footGeometry, bodyMaterial);
+        foot.position.set(i, 0.05, -0.7);
+        group.add(foot);
+    }
 
     return group;
 }
