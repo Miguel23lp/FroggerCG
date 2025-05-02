@@ -14,9 +14,9 @@ export function initGame(scene, camera) {
 
 
     const cars = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = -10; i < 15; i++) {
         const car = createCar();
-        car.position.set(i * 4 - 8, 0.5, -2);
+        car.position.set(i * 4 - 8, 0.1, -2);
         scene.add(car);
         cars.push(car);
     }
