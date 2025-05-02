@@ -105,18 +105,18 @@ export function createCar() {
     headlight2.position.set(1, 0.3, -0.4);
     
 
-    const headlightSpotLight1 = new THREE.SpotLight(0xffff00, 1, 10, Math.PI / 4, 0.5, 2);
+    const headlightSpotLight1 = new THREE.SpotLight(0xffff00, 3, 7, Math.PI / 5, 0.7, 1);
     headlight1.add(headlightSpotLight1);
     headlight1.add(headlightSpotLight1.target);
     headlightSpotLight1.position.set(0, 0, 0);
-    headlightSpotLight1.target.position.set(1, 0, 0);
+    headlightSpotLight1.target.position.set(1, -0.3, 0);
     //headlightSpotLight1.castShadow = true;
     
-    const headlightSpotLight2 = new THREE.SpotLight(0xffff00, 1, 10, Math.PI / 4, 0.5, 2);
+    const headlightSpotLight2 = new THREE.SpotLight(0xffff00, 3, 7, Math.PI / 5, 0.7, 1);
     headlight2.add(headlightSpotLight2);
     headlight2.add(headlightSpotLight2.target);
     headlightSpotLight2.position.set(0, 0, 0);
-    headlightSpotLight2.target.position.set(1, 0, 0);
+    headlightSpotLight2.target.position.set(1, -0.3, 0);
     //headlightSpotLight2.castShadow = true;
 
     headlight1.receiveShadow = true;
