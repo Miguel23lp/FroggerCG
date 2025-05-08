@@ -1,4 +1,4 @@
-import { initGame } from './game.js';
+import { initGame, gameLoop } from './game.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -49,8 +49,21 @@ scene.add(ground);
 // Initialize the game
 initGame(scene, camera);
 
-function animate() {
+
+const targetFPS = 30;
+const interval = 1000 / targetFPS; // em milissegundos (1000 ms / 30 fps = 33.33 ms)
+
+let then = performance.now();
+
+function animate(now) {
     requestAnimationFrame(animate);
-    renderer.render(scene, camera);
+    const delta = now - then;
+
+    if (delta > interval) {
+        then = now - (delta % interval); // corrige o tempo acumulado
+        gameLoop(scene, camera);
+        renderer.render(scene, camera);
+    }
+
 }
-animate();
+animate(0);

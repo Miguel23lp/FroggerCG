@@ -119,8 +119,8 @@ export function createCar() {
     headlightSpotLight2.target.position.set(1, -0.3, 0);
     //headlightSpotLight2.castShadow = true;
 
-    headlight1.receiveShadow = true;
-    headlight2.receiveShadow = true;
+    //headlight1.receiveShadow = true;
+    //headlight2.receiveShadow = true;
     group.add(headlight1, headlight2);
 
     return group;
@@ -130,6 +130,17 @@ export function createLog() {
     const geometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 32);
     const material = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
     const log = new THREE.Mesh(geometry, material);
+    log.rotation.z = Math.PI / 2; // Roda o tronco para ficar na horizontal
     return log;
 }
+
+export function createWater() {
+    const geometry = new THREE.PlaneGeometry(100, 9);
+    const material = new THREE.MeshStandardMaterial({ color: 0x1E90FF, transparent: true, opacity: 0.5 });
+    const water = new THREE.Mesh(geometry, material);
+    water.rotation.x = -Math.PI / 2; // Roda o plano para ficar na horizontal
+    water.position.y = 0.1; // Eleva o plano um pouco acima do chão
+    return water;
+}
+
 
