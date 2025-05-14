@@ -64,6 +64,5 @@ function animate(now) {
         gameLoop(scene, camera);
         renderer.render(scene, camera);
     }
-
 }
 animate(0);

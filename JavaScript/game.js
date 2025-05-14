@@ -4,7 +4,7 @@ let lanes = [];
 
 export function initGame(scene, camera) {
     const frog = createFrog();
-    frog.position.set(0, 0, 10);
+    frog.position.set(0, 0, 11);
     scene.add(frog);
     camera.position.set(0, 6, 12);
     camera.lookAt(0, -5, 0);
@@ -18,7 +18,7 @@ export function initGame(scene, camera) {
     
     const jumpDuration = 0.1; // Duração do salto em segundos
     const jumpHeight = 1; // Altura do salto em unidades de jogo
-    const jumpDistance = 1; // Distância do salto em unidades de jogo
+    const jumpDistance = 2; // Distância do salto em unidades de jogo
 
 
     // Criar faixas: 5 estrada (z = 1,3,5,7,9), 5 rio (z = -1,-3,-5,-7,-9)
