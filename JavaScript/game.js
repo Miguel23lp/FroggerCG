@@ -12,10 +12,10 @@ export function initGame(scene, camera) {
     const water = createWater(); // Criar água na posição z = -1
     water.position.set(0, 0.1, -4.5); // Ajustar a posição da água
     scene.add(water);
-    
 
-    let jumping = false; 
-    
+
+    let jumping = false;
+
     const jumpDuration = 0.1; // Duração do salto em segundos
     const jumpHeight = 1; // Altura do salto em unidades de jogo
     const jumpDistance = 2; // Distância do salto em unidades de jogo
@@ -27,7 +27,7 @@ export function initGame(scene, camera) {
         lanes.push({
             z,
             type: 'car',
-            direction: i%2 === 0 ? 1 : -1, // Direção alternada
+            direction: i % 2 === 0 ? 1 : -1, // Direção alternada
             // velocidade aleatória entre 0.005 e 0.01
             speed: Math.random() * (0.1 - 0.05) + 0.05, // Velocidade aleatória entre 0.005 e 0.01
             elements: [],
@@ -39,7 +39,7 @@ export function initGame(scene, camera) {
         lanes.push({
             z,
             type: 'log',
-            direction: i%2 === 0 ? 1 : -1, // Direção alternada
+            direction: i % 2 === 0 ? 1 : -1, // Direção alternada
             speed: Math.random() * (0.1 - 0.05) + 0.05, // Velocidade aleatória entre 0.005 e 0.01
             elements: [],
         });
@@ -63,7 +63,7 @@ export function initGame(scene, camera) {
         let targetX = frog.position.x;
         let targetZ = frog.position.z;
         let rotation = frog.rotation.y;
-        
+
         if (event.repeat) return;
         if (jumping) return; // Ignora se já estiver a saltar
 
@@ -93,19 +93,19 @@ export function initGame(scene, camera) {
         }
 
         frog.rotation.y = rotation;
-        
+
         if (!jumping) {
             return;
         }
 
         // Animação do salto com GSAP
         gsap.to(frog.position, {
-            duration: jumpDuration/2,
+            duration: jumpDuration / 2,
             y: jumpHeight,
             ease: "power2.out",
             onComplete: () => {
                 gsap.to(frog.position, {
-                    duration: jumpDuration/2,
+                    duration: jumpDuration / 2,
                     y: 0,
                     ease: "bounce.out"
                 });
@@ -123,9 +123,11 @@ export function initGame(scene, camera) {
             }
         });
     });
+
+    return frog;
 }
 
-export function gameLoop(scene, camera) {
+export function gameLoop(scene, camera, frog) {
     lanes.forEach(lane => {
         lane.elements.forEach(obj => {
             obj.position.x += lane.speed * lane.direction;
@@ -137,5 +139,43 @@ export function gameLoop(scene, camera) {
             }
         });
     });
-    
+
+    checkCollisions(frog);
+}
+
+function checkCollisions(frog) {
+    let isOnLog = false;
+
+    lanes.forEach(lane => {
+        const isSameLane = Math.abs(frog.position.z - lane.z) < 0.5;
+
+        if (lane.type === 'car' && isSameLane) {
+            lane.elements.forEach(car => {
+                if (Math.abs(frog.position.x - car.position.x) < 1.2) {
+                    console.log("💥 Colisão com carro!");
+                    frog.position.set(0, 0, 11);
+                }
+            });
+        }
+
+        if (lane.type === 'log' && isSameLane) {
+            lane.elements.forEach(log => {
+                if (Math.abs(frog.position.x - log.position.x) < 2.5) {
+                    isOnLog = true;
+                    // O sapo move-se com o tronco:
+                    frog.position.x += lane.speed * lane.direction;
+                }
+            });
+        }
+    });
+
+    // Se estiver em faixa de troncos mas não estiver em nenhum
+    const isInWaterZone = lanes.some(lane =>
+        lane.type === 'log' && Math.abs(frog.position.z - lane.z) < 0.5
+    );
+
+    if (isInWaterZone && !isOnLog) {
+        console.log("💧 Caiu na água!");
+        frog.position.set(0, 0, 11);
+    }
 }
