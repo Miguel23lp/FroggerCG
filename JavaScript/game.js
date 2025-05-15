@@ -1,27 +1,127 @@
 import { createFrog, createCar, createLog, createWater } from './objects.js';
 
-let lanes = [];
+const jumpDuration = 0.1; // Duração do salto em segundos
+const jumpHeight = 1; // Altura do salto em unidades de jogo
+const jumpDistance = 2; // Distância do salto em unidades de jogo
 
-export function initGame(scene, camera) {
-    const frog = createFrog();
-    frog.position.set(0, 0, 11);
-    scene.add(frog);
-    camera.position.set(0, 6, 12);
-    camera.lookAt(0, -5, 0);
+const startLives = 3; // Número inicial de vidas
 
-    const water = createWater(); // Criar água na posição z = -1
-    water.position.set(0, 0.1, -4.5); // Ajustar a posição da água
-    scene.add(water);
-
-
-    let jumping = false;
-
-    const jumpDuration = 0.1; // Duração do salto em segundos
-    const jumpHeight = 1; // Altura do salto em unidades de jogo
-    const jumpDistance = 2; // Distância do salto em unidades de jogo
+let currentCamera;
+let currentScene;
+let gameState;
+let frog;
+let jumping;
+let lanes;
+let lives;
+let score;
+let messageElement;
+let livesElement;
+let scoreElement;
 
 
-    // Criar faixas: 5 estrada (z = 1,3,5,7,9), 5 rio (z = -1,-3,-5,-7,-9)
+// Create lives display element
+function createLivesDisplay() {
+    const livesElement = document.createElement('div');
+    livesElement.id = 'lives';
+    livesElement.style.position = 'absolute';
+    livesElement.style.top = '20px';
+    livesElement.style.left = '20px';
+    livesElement.style.color = 'red';
+    livesElement.style.fontSize = '32px';
+    // Add CSS animation for lives
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeOut {
+            0% { transform: scale(1.5); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        #lives {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+        #lives:empty {
+            display: none;
+        }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(livesElement);
+    return livesElement;
+}
+
+// Create score display element
+function createScoreDisplay() {
+    const scoreElement = document.createElement('div');
+    scoreElement.id = 'score';
+    scoreElement.style.position = 'absolute';
+    scoreElement.style.top = '20px';
+    scoreElement.style.right = '20px';
+    scoreElement.style.color = 'white';
+    scoreElement.style.fontSize = '32px';
+    // Add CSS animation for score
+    const style = document.createElement('style');
+    style.textContent = `
+        #score {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(scoreElement);
+    return scoreElement;
+}
+
+// Create message display element
+function createMessageDisplay() {
+    const messageElement = document.createElement('div');
+    messageElement.id = 'message';
+    messageElement.style.position = 'absolute';
+    messageElement.style.top = '10%';
+    messageElement.style.left = '50%';
+    messageElement.style.transform = 'translate(-50%, -50%)';
+    messageElement.style.color = 'white';
+    messageElement.style.fontSize = '24px';
+    messageElement.style.fontFamily = 'Arial, sans-serif';
+    messageElement.style.textAlign = 'center';
+    messageElement.style.display = 'none';
+    
+    // Add CSS animation for blinking
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        #message {
+            text-shadow: #000 0px 0px 1px,   #000 0px 0px 1px,   #000 0px 0px 1px,
+             #000 0px 0px 1px,   #000 0px 0px 1px,   #000 0px 0px 1px;
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(messageElement);
+    return messageElement;
+}
+
+function showMessage(message, shouldBlink = false) {
+    messageElement.textContent = message;
+    messageElement.style.display = 'block';
+    if (shouldBlink) {
+        messageElement.classList.add('blink');
+    } else {
+        messageElement.classList.remove('blink');
+    }
+}
+
+function hideMessage() {
+    messageElement.style.display = 'none';
+    messageElement.classList.remove('blink');
+}
+
+function createLanes() {
+// Criar faixas: 5 estrada (z = 1,3,5,7,9), 5 rio (z = -1,-3,-5,-7,-9)
     for (let i = 0; i < 4; i++) {
         let z = 1 + i * 2;
         lanes.push({
@@ -53,13 +153,64 @@ export function initGame(scene, camera) {
             if (lane.type === 'car' && lane.direction === -1) {
                 obj.rotation.y = Math.PI;
             }
-            scene.add(obj);
+            currentScene.add(obj);
             lane.elements.push(obj);
         }
     });
+}
 
+
+function clearLanes() {
+    lanes.forEach(lane => {
+        lane.elements.forEach(obj => {
+            obj.parent.remove(obj);
+        });
+    });
+    lanes = [];
+}
+
+
+export function initGame(scene, camera) {
+    currentScene = scene;
+    currentCamera = camera;
+    
+    gameState = 'Play';
+    frog = createFrog();
+    currentScene.add(frog);
+    jumping = false;
+    lanes = [];
+    lives = startLives;
+    score = 0;
+    messageElement = createMessageDisplay();
+    livesElement = createLivesDisplay();
+    scoreElement = createScoreDisplay();
+
+    const water = createWater(); // Criar água na posição z = -1
+    water.position.set(0, 0.1, -4.5); // Ajustar a posição da água
+    currentScene.add(water);
+
+    resetGame();
+    respawnPlayer();
 
     document.addEventListener('keydown', (event) => {
+        if (gameState === 'Dead') {
+            if (event.code === 'Space') {
+                respawnPlayer();
+                return;
+            }
+        }
+
+        if (gameState === 'Game Over') {
+            if (event.code === 'Space') {// Reiniciar jogo
+                resetGame();
+                return;
+            }
+        }
+
+        if (gameState !== 'Play') {
+            return; // Ignore inputs if not in play state
+        }
+
         let targetX = frog.position.x;
         let targetZ = frog.position.z;
         let rotation = frog.rotation.y;
@@ -123,11 +274,35 @@ export function initGame(scene, camera) {
             }
         });
     });
-
-    return frog;
 }
 
-export function gameLoop(scene, camera, frog) {
+function resetGame() {
+    lives = startLives;
+    score = 0;
+    updateLives();
+    updateScore();
+
+    respawnPlayer();
+}
+
+function respawnPlayer() {
+    gameState = 'Play';
+    hideMessage();
+    
+    clearLanes();
+    createLanes();
+    
+    frog.position.set(0, 0, 11);
+    frog.rotation.y = 0;
+    currentCamera.position.set(0, 6, 12);
+    currentCamera.lookAt(0, -5, 0);
+}
+
+export function gameLoop() {
+    if (gameState !== 'Play') {
+        return; // Stop game updates while dead
+    }
+
     lanes.forEach(lane => {
         lane.elements.forEach(obj => {
             obj.position.x += lane.speed * lane.direction;
@@ -140,10 +315,10 @@ export function gameLoop(scene, camera, frog) {
         });
     });
 
-    checkCollisions(frog);
+    checkCollisions();
 }
 
-function checkCollisions(frog) {
+function checkCollisions() {
     let isOnLog = false;
 
     lanes.forEach(lane => {
@@ -153,7 +328,7 @@ function checkCollisions(frog) {
             lane.elements.forEach(car => {
                 if (Math.abs(frog.position.x - car.position.x) < 1.2) {
                     console.log("💥 Colisão com carro!");
-                    frog.position.set(0, 0, 11);
+                    handleLose();
                 }
             });
         }
@@ -166,16 +341,42 @@ function checkCollisions(frog) {
                     frog.position.x += lane.speed * lane.direction;
                 }
             });
+
+            if (!isOnLog) {
+                // Sapo caiu na água
+                handleLose();
+            }
         }
     });
 
-    // Se estiver em faixa de troncos mas não estiver em nenhum
-    const isInWaterZone = lanes.some(lane =>
-        lane.type === 'log' && Math.abs(frog.position.z - lane.z) < 0.5
-    );
+}
 
-    if (isInWaterZone && !isOnLog) {
-        console.log("💧 Caiu na água!");
-        frog.position.set(0, 0, 11);
+function handleLose() {
+    console.log("💥 Game Over!");
+    lives--;
+    updateLives();
+    
+    if (lives <= 0) {
+        gameState = 'Game Over';
+        showMessage('Game Over!\nPress Space to restart');
+    } else {
+        gameState = 'Dead';
+        showMessage(`Perdeu uma vida! ${lives} vidas restantes\nPressione espaço para continuar`, true);
     }
+}
+
+function updateLives() {
+    // Create heart symbols (❤) for each life
+    livesElement.textContent = '❤'.repeat(lives);
+    
+    // Add fade out animation when losing a life
+    if (lives < startLives) {
+        livesElement.style.animation = 'none';
+        livesElement.offsetHeight; // Trigger reflow
+        livesElement.style.animation = 'fadeOut 0.5s';
+    }
+}
+
+function updateScore() {
+    scoreElement.textContent = score;
 }

@@ -47,7 +47,7 @@ ground.receiveShadow = true;
 scene.add(ground);
 
 // Initialize the game
-const frog = initGame(scene, camera);
+initGame(scene, camera);
 
 
 const targetFPS = 30;
@@ -61,7 +61,7 @@ function animate(now) {
 
     if (delta > interval) {
         then = now - (delta % interval); // corrige o tempo acumulado
-        gameLoop(scene, camera, frog);
+        gameLoop();
         renderer.render(scene, camera);
     }
 }
