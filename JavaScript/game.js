@@ -149,7 +149,11 @@ function createLanes() {
     lanes.forEach(lane => {
         for (let i = 0; i < 6; i++) {
             const obj = lane.type === 'car' ? createCar() : createLog();
-            obj.position.set(i * 6 - 20, 0.2, lane.z);
+            const minX = -25;
+            const maxX = 25;
+            const maxVariation = 2.5;
+            const x = (maxX-minX) * (i / 6) + minX;
+            obj.position.set(x + (Math.random()-0.5)*2*maxVariation, 0.1, lane.z);
             if (lane.type === 'car' && lane.direction === -1) {
                 obj.rotation.y = Math.PI;
             }
@@ -307,10 +311,10 @@ export function gameLoop() {
         lane.elements.forEach(obj => {
             obj.position.x += lane.speed * lane.direction;
 
-            if (lane.direction === 1 && obj.position.x > 20) {
-                obj.position.x = -20;
-            } else if (lane.direction === -1 && obj.position.x < -20) {
-                obj.position.x = 20;
+            if (lane.direction === 1 && obj.position.x > 25) {
+                obj.position.x = -25;
+            } else if (lane.direction === -1 && obj.position.x < -25) {
+                obj.position.x = 25;
             }
         });
     });
