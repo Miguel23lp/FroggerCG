@@ -60,8 +60,8 @@ function animate(now) {
     const delta = now - then;
 
     if (delta > interval) {
-        then = now - (delta % interval);
-        gameLoop(scene, camera);
+        then = now - (delta % interval); // corrige o tempo acumulado
+        gameLoop();
         renderer.render(scene, camera);
     }
 }
