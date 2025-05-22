@@ -25,7 +25,6 @@ const checkpointSound = new Audio('./sounds/checkpoint.wav');
 let checkpoints = [];
 let checkpointsVisitados = new Set();
 
-let obstacleSpeedMultiplier = 1;
 let globalVolume = 0.5;
 
 
@@ -34,8 +33,8 @@ function createLivesDisplay() {
     const livesElement = document.createElement('div');
     livesElement.id = 'lives';
     livesElement.style.position = 'absolute';
-    livesElement.style.top = '20px';
-    livesElement.style.left = '20px';
+    livesElement.style.top = '50px';
+    livesElement.style.left = '10px';
     livesElement.style.color = 'red';
     livesElement.style.fontSize = '32px';
     // Add CSS animation for lives
@@ -63,13 +62,14 @@ function createScoreDisplay() {
     const scoreElement = document.createElement('div');
     scoreElement.id = 'score';
     scoreElement.style.position = 'absolute';
-    scoreElement.style.top = '20px';
-    scoreElement.style.right = '20px';
+    scoreElement.style.top = '10px';
+    scoreElement.style.right = '100px';
     scoreElement.style.color = 'white';
     scoreElement.style.fontSize = '32px';
     // Add CSS animation for score
     const style = document.createElement('style');
     style.textContent = `
+
         #score {
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
@@ -203,19 +203,7 @@ export function initGame(scene, camera) {
     const water = createWater(); // Criar água na posição z = -1
     water.position.set(0, 0.1, -4.5); // Ajustar a posição da água
     currentScene.add(water);
-    // Criar os 3 checkpoints (após o rio)
-    checkpoints = [];
-
-    for (let i = 0; i < 3; i++) {
-        const geometry = new THREE.BoxGeometry(2, 0.2, 2);
-        const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-        const checkpoint = new THREE.Mesh(geometry, material);
-        checkpoint.position.set(-4 + i * 4, 0.1, -9);
-        checkpoint.receiveShadow = true;
-
-        checkpoints.push(checkpoint);
-        scene.add(checkpoint);
-    }
+    
 
     resetGame();
     respawnPlayer();
@@ -314,9 +302,24 @@ export function initGame(scene, camera) {
 function resetGame() {
     lives = startLives;
     score = 0;
+    checkpointsVisitados.clear();
+    // Criar os 3 checkpoints (após o rio)
+    checkpoints.forEach(checkpoint => {
+        checkpoint.parent.remove(checkpoint);
+    });
+    checkpoints = [];
+    for (let i = 0; i < 3; i++) {
+        const geometry = new THREE.BoxGeometry(2, 0.2, 2);
+        const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+        const checkpoint = new THREE.Mesh(geometry, material);
+        checkpoint.position.set(-4 + i * 4, 0.1, -9);
+        checkpoint.receiveShadow = true;
+
+        checkpoints.push(checkpoint);
+        currentScene.add(checkpoint);
+    }
     updateLives();
     updateScore();
-
     respawnPlayer();
 }
 
@@ -386,22 +389,21 @@ function checkCollisions() {
 
     // Verificar checkpoints
     checkpoints.forEach((cp, index) => {
+        if (jumping) return; // Ignora se já estiver a saltar
         if (checkpointsVisitados.has(index)) return;
 
-        const cpBox = new THREE.Box3().setFromObject(cp);
-        if (frogBox.intersectsBox(cpBox)) {
+        if (Math.abs(frog.position.x - cp.position.x) < 1 && Math.abs(frog.position.z - cp.position.z) < 1) {
             checkpointsVisitados.add(index);
             score++;
-            atualizarScore();
+            updateScore();
 
             cp.material.color.set(0xffff00);
 
-            frog.position.set(0, 0, 11);
-            jumping = false;
 
             // Tocar som do checkpoint
             checkpointSound.currentTime = 0;
             checkpointSound.play();
+            respawnPlayer();
 
             // Verificar se todos os checkpoints foram visitados (ganhar)
             if (checkpointsVisitados.size === checkpoints.length) {
@@ -418,13 +420,14 @@ function checkCollisions() {
     });
 }
 
-}
+
 
 function handleLose() {
     console.log("💥 Game Over!");
     lives--;
     updateLives();
-    
+    loseSound.currentTime = 0;
+    loseSound.play();
     if (lives <= 0) {
         gameState = 'Game Over';
         showMessage('Game Over!\nPress Space to restart');
@@ -436,10 +439,11 @@ function handleLose() {
 
 export function setGlobalVolume(volume) {
     globalVolume = volume;
-    // Atualiza o volume de todos os sons, ex:
-    // jumpSound.volume = volume;
-    // backgroundMusic.volume = volume * 0.4;
-    // otherSounds.forEach(sound => sound.volume = volume);
+    jumpSound.volume = volume;
+    backgroundMusic.volume = volume * 0.1;
+    winSound.volume = volume;
+    loseSound.volume = volume;
+    checkpointSound.volume = volume;
 }
 
 

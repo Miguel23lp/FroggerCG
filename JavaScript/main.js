@@ -1,4 +1,4 @@
-import { initGame, gameLoop, verificarColisoes, setObstacleSpeedMultiplier, setGlobalVolume } from './game.js';
+import { initGame, gameLoop, setGlobalVolume } from './game.js';
 
 let scene, camera, renderer;
 let then = performance.now();
@@ -6,7 +6,6 @@ let then = performance.now();
 let backgroundMusic;
 
 let volume = 0.5; // volume inicial padrão
-let difficultyMultiplier = 1;
 
 
 const targetFPS = 30;
@@ -70,8 +69,6 @@ function animate(now) {
 window.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.getElementById('startBtn');
     const menu = document.getElementById('menu');
-    const lives = document.getElementById('lives');
-    const increaseDifficultyBtn = document.getElementById('increaseDifficultyBtn');
     const volumeControl = document.getElementById('volumeControl');
 
     const clickSound = new Audio('sounds/click.wav');
@@ -81,7 +78,6 @@ window.addEventListener('DOMContentLoaded', () => {
         clickSound.play();
 
         menu.style.display = 'none';
-        lives.style.display = 'block';
 
         iniciarJogo();
 
@@ -91,11 +87,6 @@ window.addEventListener('DOMContentLoaded', () => {
         backgroundMusic.play();
     });
 
-    increaseDifficultyBtn.addEventListener('click', () => {
-        difficultyMultiplier *= 1.5;
-        setObstacleSpeedMultiplier(difficultyMultiplier);
-        increaseDifficultyBtn.textContent = `Dificuldade x${difficultyMultiplier.toFixed(2)}`;
-    });
 
     volumeControl.addEventListener('input', (e) => {
         const volume = parseFloat(e.target.value);
