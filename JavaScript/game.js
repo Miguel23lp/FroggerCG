@@ -148,16 +148,21 @@ function createLanes() {
     // Criar objetos nas faixas
     lanes.forEach(lane => {
         for (let i = 0; i < 6; i++) {
-            const obj = lane.type === 'car' ? createCar() : createLog();
-            const minX = -25;
-            const maxX = 25;
-            const maxVariation = 2.5;
-            const x = (maxX-minX) * (i / 6) + minX;
-            obj.position.set(x + (Math.random()-0.5)*2*maxVariation, 0.1, lane.z);
+            let obj;
+
+            if (lane.type === 'car') {
+                obj = Math.random() < 0.8 ? createCar() : createVan();
+            } else {
+                obj = createLog();
+            }
+
+            obj.position.set(i * 6 - 20, 0.2, lane.z);
+
             if (lane.type === 'car' && lane.direction === -1) {
                 obj.rotation.y = Math.PI;
             }
-            currentScene.add(obj);
+
+            scene.add(obj);
             lane.elements.push(obj);
         }
     });

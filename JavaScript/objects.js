@@ -63,6 +63,9 @@ export function createFrog() {
 export function createCar() {
     const group = new THREE.Group();
 
+    const colors = [0xff0000, 0x0000ff, 0x00ff00];
+    const chosenColor = colors[Math.floor(Math.random() * colors.length)]
+
     // Body
     const bodyGeometry = new THREE.BoxGeometry(2, 0.5, 1);
     const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
@@ -122,6 +125,70 @@ export function createCar() {
     //headlight1.receiveShadow = true;
     //headlight2.receiveShadow = true;
     group.add(headlight1, headlight2);
+
+    return group;
+}
+
+export function createVan() {
+    const group = new THREE.Group();
+
+    const bodyColor = 0xcccccc;
+    const bumperColor = 0x333333;
+    const windowColor = 0x111111;
+
+    // Corpo principal
+    const body = new THREE.Mesh(
+        new THREE.BoxGeometry(3.2, 1.6, 1.2),
+        new THREE.MeshStandardMaterial({ color: bodyColor })
+    );
+    body.position.set(0, 0.8, 0);
+    group.add(body);
+
+    // Frontal
+    const hood = new THREE.Mesh(
+        new THREE.BoxGeometry(1.0, 0.5, 1.2),
+        new THREE.MeshStandardMaterial({ color: bodyColor })
+    );
+    hood.position.set(1.6, 0.55, 0);
+    hood.rotation.x = -0.08;
+    group.add(hood);
+
+    // Vidro dianteiro
+    const frontWindow = new THREE.Mesh(
+        new THREE.BoxGeometry(1.0, 0.5, 1.1),
+        new THREE.MeshStandardMaterial({ color: windowColor })
+    );
+    frontWindow.position.set(1.2, 1.2, 0);
+    group.add(frontWindow);
+
+    // Retrovisores
+    const mirrorGeometry = new THREE.BoxGeometry(0.05, 0.3, 0.15);
+    const mirrorMaterial = new THREE.MeshStandardMaterial({ color: 0x111111 });
+
+    const mirrorLeft = new THREE.Mesh(mirrorGeometry, mirrorMaterial);
+    mirrorLeft.position.set(1.0, 1.1, 0.75);
+    const mirrorRight = mirrorLeft.clone();
+    mirrorRight.position.z = -0.75;
+    group.add(mirrorLeft, mirrorRight);
+
+    const wheelPositions = [
+        [-1.1, 0.25, 0.6], [-1.1, 0.25, -0.6],
+        [1.1, 0.25, 0.6], [1.1, 0.25, -0.6],
+    ];
+
+    wheelPositions.forEach(([x, y, z]) => {
+        const wheelGroup = new THREE.Group();
+
+        const tire = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.25, 0.25, 0.1, 32),
+            new THREE.MeshStandardMaterial({ color: 0x000000 })
+        );
+        tire.rotation.x = Math.PI / 2;
+        wheelGroup.add(tire);
+
+        wheelGroup.position.set(x, y, z);
+        group.add(wheelGroup);
+    });
 
     return group;
 }
