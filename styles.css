@@ -1,4 +1,141 @@
+/* styles.css */
+
 body {
     margin: 0;
     overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #000;
+    color: white;
+}
+
+#menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(to bottom, #111, #222);
+    text-align: center;
+}
+
+#menu h1 {
+    font-size: 64px;
+    margin-bottom: 30px;
+    color: #00ff99;
+    text-shadow: 2px 2px 8px #000;
+}
+
+#menu button {
+    padding: 15px 40px;
+    font-size: 24px;
+    background-color: #00cc66;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    box-shadow: 0 0 10px #00cc66;
+}
+
+#menu button:hover {
+    background-color: #00994d;
+    box-shadow: 0 0 20px #00cc66;
+}
+
+/* Pontuação e Vidas */
+#score, #lives {
+    font-size: 20px;
+    position: absolute;
+    z-index: 10;
+}
+
+#score {
+    top: 10px;
+    left: 10px;
+}
+
+#lives {
+    top: 10px;
+    right: 10px;
+}
+
+#increaseDifficultyBtn {
+    display: block;
+    margin: 20px 0 0 20px; /* margem só à esquerda e topo */
+    padding: 10px 25px;     /* ligeiramente menor */
+    font-size: 16px;        /* fonte menor */
+    background: linear-gradient(45deg, #00cc66, #00994d);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 0 12px #00cc66;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 600;
+    width: auto;            /* largura automática */
+    text-align: center;
+    user-select: none;
+    position: absolute;
+    top: 60px;              /* um pouco abaixo das vidas */
+    left: 20px;             /* à esquerda com margem */
+    z-index: 20;            /* acima da cena */
+}
+
+#increaseDifficultyBtn:hover {
+    background: linear-gradient(45deg, #00994d, #007a33);
+    box-shadow: 0 0 20px #00ff99;
+}
+
+#increaseDifficultyBtn:active {
+    background: linear-gradient(45deg, #007a33, #005522);
+    box-shadow: 0 0 10px #00994d;
+    transform: scale(0.98);
+}
+
+#volumeControl {
+    width: 120px;
+    height: 6px;
+    cursor: pointer;
+    background: #222;
+    border-radius: 10px;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    box-shadow: 0 0 5px #00cc66;
+    transition: box-shadow 0.3s ease;
+}
+
+#volumeControl:hover {
+    box-shadow: 0 0 10px #00ff99;
+}
+
+#volumeControl::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #00cc66;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 6px #00cc66;
+    transition: background 0.3s ease;
+    margin-top: -6px; /* centraliza no track */
+}
+
+#volumeControl::-webkit-slider-thumb:hover {
+    background: #00ff99;
+}
+
+#volumeControl::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #00cc66;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 6px #00cc66;
+    transition: background 0.3s ease;
+}
+
+#volumeControl::-moz-range-thumb:hover {
+    background: #00ff99;
 }
