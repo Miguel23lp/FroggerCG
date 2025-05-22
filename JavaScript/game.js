@@ -1,4 +1,4 @@
-import { createFrog, createCar, createLog, createWater } from './objects.js';
+import { createFrog, createCar, createLog, createWater, createVan } from './objects.js';
 
 const jumpDuration = 0.1; // Duração do salto em segundos
 const jumpHeight = 1; // Altura do salto em unidades de jogo
@@ -139,7 +139,7 @@ function createLanes() {
             type: 'car',
             direction: i % 2 === 0 ? 1 : -1, // Direção alternada
             // velocidade aleatória entre 0.005 e 0.01
-            speed: Math.random() * (0.1 - 0.05) + 0.05, // Velocidade aleatória entre 0.005 e 0.01
+            speed: 0.2*Math.random() * (0.1 - 0.05) + 0.05, // Velocidade aleatória entre 0.005 e 0.01
             elements: [],
         });
     }
@@ -151,23 +151,27 @@ function createLanes() {
             z,
             type: 'log',
             direction: i % 2 === 0 ? 1 : -1, // Direção alternada
-            speed: Math.random() * (0.1 - 0.05) + 0.05, // Velocidade aleatória entre 0.005 e 0.01
+            speed: 0.2*Math.random() * (0.1 - 0.05) + 0.05, // Velocidade aleatória entre 0.005 e 0.01
             elements: [],
         });
     }
 
-    // Adicionar objetos às faixas
     lanes.forEach(lane => {
-        for (let i = 0; i < 6; i++) {
-            const obj = lane.type === 'car' ? createCar() : createLog();
-            const minX = -25;
-            const maxX = 25;
-            const maxVariation = 2.5;
-            const x = (maxX-minX) * (i / 6) + minX;
-            obj.position.set(x + (Math.random()-0.5)*2*maxVariation, 0.1, lane.z);
+        for (let i = 0; i < 3; i++) {
+            let obj;
+
+            if (lane.type === 'car') {
+                obj = Math.random() < 0.8 ? createCar() : createVan();
+            } else {
+                obj = createLog();
+            }
+
+            obj.position.set(i * 6 - 20, 0.2, lane.z);
+
             if (lane.type === 'car' && lane.direction === -1) {
                 obj.rotation.y = Math.PI;
             }
+
             currentScene.add(obj);
             lane.elements.push(obj);
         }
@@ -236,28 +240,28 @@ export function initGame(scene, camera) {
 
         switch (event.key) {
             case 'ArrowUp':
-                targetZ -= 2;
+                targetZ -= jumpDistance;
                 rotation = 0;
                 jumping = true;
                 jumpSound.currentTime = 0;
                 jumpSound.play();
                 break;
             case 'ArrowDown':
-                targetZ += 2;
+                targetZ += jumpDistance;
                 rotation = Math.PI;
                 jumping = true;
                 jumpSound.currentTime = 0;
                 jumpSound.play();
                 break;
             case 'ArrowLeft':
-                targetX -= 2;
+                targetX -= jumpDistance;
                 rotation = Math.PI / 2;
                 jumping = true;
                 jumpSound.currentTime = 0;
                 jumpSound.play();
                 break;
             case 'ArrowRight':
-                targetX += 2;
+                targetX += jumpDistance;
                 rotation = -Math.PI / 2;
                 jumping = true;
                 jumpSound.currentTime = 0;
@@ -355,6 +359,11 @@ export function gameLoop() {
 
     checkCollisions();
 }
+function isColliding(object1, object2) {
+    const box1 = new THREE.Box3().setFromObject(object1);
+    const box2 = new THREE.Box3().setFromObject(object2);
+    return box1.intersectsBox(box2);
+}
 
 function checkCollisions() {
     let isOnLog = false;
@@ -364,8 +373,7 @@ function checkCollisions() {
 
         if (lane.type === 'car' && isSameLane) {
             lane.elements.forEach(car => {
-                if (Math.abs(frog.position.x - car.position.x) < 1.2) {
-                    console.log("💥 Colisão com carro!");
+                if (isColliding(frog, car)) {
                     handleLose();
                 }
             });
@@ -373,7 +381,7 @@ function checkCollisions() {
 
         if (lane.type === 'log' && isSameLane) {
             lane.elements.forEach(log => {
-                if (Math.abs(frog.position.x - log.position.x) < 2.5) {
+                if (isColliding(frog, log)) {
                     isOnLog = true;
                     // O sapo move-se com o tronco:
                     frog.position.x += lane.speed * lane.direction;
