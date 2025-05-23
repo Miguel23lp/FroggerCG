@@ -5,12 +5,13 @@ const jumpHeight = 1; // Altura do salto em unidades de jogo
 const jumpDistance = 2; // Distância do salto em unidades de jogo
 
 const startLives = 3; // Número inicial de vidas
+const difficultyMultiplier = 0.5;
 
 let currentCamera;
 let currentScene;
 let gameState;
 let frog;
-let jumping;
+let isJumping;
 let lanes;
 let lives;
 let score;
@@ -131,15 +132,14 @@ function hideMessage() {
 }
 
 function createLanes() {
-// Criar faixas: 5 estrada (z = 1,3,5,7,9), 5 rio (z = -1,-3,-5,-7,-9)
+    
     for (let i = 0; i < 4; i++) {
         let z = 1 + i * 2;
         lanes.push({
             z,
             type: 'car',
             direction: i % 2 === 0 ? 1 : -1, // Direção alternada
-            // velocidade aleatória entre 0.005 e 0.01
-            speed: 0.2*Math.random() * (0.1 - 0.05) + 0.05, // Velocidade aleatória entre 0.005 e 0.01
+            speed: difficultyMultiplier * Math.random() * (0.1 - 0.075) + 0.075, // Velocidade aleatória entre 0.075 e 0.1
             elements: [],
         });
     }
@@ -150,28 +150,29 @@ function createLanes() {
         lanes.push({
             z,
             type: 'log',
-            direction: i % 2 === 0 ? 1 : -1, // Direção alternada
-            speed: 0.2*Math.random() * (0.1 - 0.05) + 0.05, // Velocidade aleatória entre 0.005 e 0.01
+            direction: i % 2 === 0 ? -1 : 1, // Direção alternada
+            speed: difficultyMultiplier * Math.random() * (0.1 - 0.075) + 0.075, // Velocidade aleatória entre 0.075 e 0.1
             elements: [],
         });
     }
 
     lanes.forEach(lane => {
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 6; i++) {
             let obj;
-
             if (lane.type === 'car') {
                 obj = Math.random() < 0.8 ? createCar() : createVan();
             } else {
                 obj = createLog();
             }
-
-            obj.position.set(i * 6 - 20, 0.2, lane.z);
+            const minX = -25;
+            const maxX = 25;
+            const maxVariation = 2.5;
+            const x = (maxX-minX) * (i / 6) + minX;
+            obj.position.set(x + (Math.random()-0.5)*2*maxVariation, 0.1, lane.z);
 
             if (lane.type === 'car' && lane.direction === -1) {
                 obj.rotation.y = Math.PI;
             }
-
             currentScene.add(obj);
             lane.elements.push(obj);
         }
@@ -196,7 +197,7 @@ export function initGame(scene, camera) {
     gameState = 'Play';
     frog = createFrog();
     currentScene.add(frog);
-    jumping = false;
+    isJumping = false;
     lanes = [];
     lives = startLives;
     score = 0;
@@ -236,34 +237,34 @@ export function initGame(scene, camera) {
         let rotation = frog.rotation.y;
 
         if (event.repeat) return;
-        if (jumping) return; // Ignora se já estiver a saltar
+        if (isJumping) return; // Ignora se já estiver a saltar
 
         switch (event.key) {
             case 'ArrowUp':
                 targetZ -= jumpDistance;
                 rotation = 0;
-                jumping = true;
+                isJumping = true;
                 jumpSound.currentTime = 0;
                 jumpSound.play();
                 break;
             case 'ArrowDown':
                 targetZ += jumpDistance;
                 rotation = Math.PI;
-                jumping = true;
+                isJumping = true;
                 jumpSound.currentTime = 0;
                 jumpSound.play();
                 break;
             case 'ArrowLeft':
                 targetX -= jumpDistance;
                 rotation = Math.PI / 2;
-                jumping = true;
+                isJumping = true;
                 jumpSound.currentTime = 0;
                 jumpSound.play();
                 break;
             case 'ArrowRight':
                 targetX += jumpDistance;
                 rotation = -Math.PI / 2;
-                jumping = true;
+                isJumping = true;
                 jumpSound.currentTime = 0;
                 jumpSound.play();
                 break;
@@ -273,7 +274,7 @@ export function initGame(scene, camera) {
 
         frog.rotation.y = rotation;
 
-        if (!jumping) {
+        if (!isJumping) {
             return;
         }
 
@@ -297,7 +298,7 @@ export function initGame(scene, camera) {
             z: targetZ,
             ease: "power1.inOut",
             onComplete: () => {
-                jumping = false;
+                isJumping = false;
             }
         });
     });
@@ -379,9 +380,13 @@ function checkCollisions() {
             });
         }
 
+        if (isJumping)
+            return;
+
         if (lane.type === 'log' && isSameLane) {
             lane.elements.forEach(log => {
-                if (isColliding(frog, log)) {
+                if (isJumping) return;
+                if (Math.abs(log.position.x - frog.position.x) < 1.5){
                     isOnLog = true;
                     // O sapo move-se com o tronco:
                     frog.position.x += lane.speed * lane.direction;
@@ -397,7 +402,7 @@ function checkCollisions() {
 
     // Verificar checkpoints
     checkpoints.forEach((cp, index) => {
-        if (jumping) return; // Ignora se já estiver a saltar
+        if (isJumping) return; // Ignora se já estiver a saltar
         if (checkpointsVisitados.has(index)) return;
 
         if (Math.abs(frog.position.x - cp.position.x) < 1 && Math.abs(frog.position.z - cp.position.z) < 1) {
