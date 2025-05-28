@@ -408,14 +408,15 @@ function checkCollisions() {
             // Verificar se todos os checkpoints foram visitados (ganhar)
             if (checkpointsVisitados.size === checkpoints.length) {
                 setTimeout(() => {
-                    // Tocar som de vitória
-                    winSound.currentTime = 0;
-                    winSound.play();
+                winSound.currentTime = 0;
+                winSound.play();
+                showMessage("🎉 Parabéns! Completaste todos os checkpoints!");
+                setTimeout(() => {
+                    showMainMenu(); // <- volta ao menu após mais 2 segundos
+                }, 2000);
+    }, 100);
+}
 
-                    alert("🎉 Parabéns! Completaste todos os checkpoints!");
-                    location.reload();
-                }, 100);
-            }
         }
     });
 }
@@ -431,6 +432,10 @@ function handleLose() {
     if (lives <= 0) {
         gameState = 'Game Over';
         showMessage('Game Over!\nPress Space to restart');
+           setTimeout(() => {
+            showMainMenu(); // <- volta ao menu
+        }, 2000); // Espera 2 segundos para o jogador ler a mensagem
+
     } else {
         gameState = 'Dead';
         showMessage(`Perdeu uma vida! ${lives} vidas restantes\nPressione espaço para continuar`, true);
@@ -465,4 +470,9 @@ function updateLives() {
 
 function updateScore() {
     scoreElement.textContent = score;
+}
+
+function showMainMenu() {
+    document.getElementById('game-container').style.display = 'none';
+    document.getElementById('main-menu').style.display = 'block';
 }
