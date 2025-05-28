@@ -312,7 +312,7 @@ function resetGame() {
         const geometry = new THREE.BoxGeometry(2, 0.2, 2);
         const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
         const checkpoint = new THREE.Mesh(geometry, material);
-        checkpoint.position.set(-4 + i * 4, 0.1, -9);
+        checkpoint.position.set(-13 + i * 13, 0.1, -9);
         checkpoint.receiveShadow = true;
 
         checkpoints.push(checkpoint);
