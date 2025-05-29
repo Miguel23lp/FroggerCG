@@ -418,15 +418,20 @@ function checkCollisions() {
     // Verificar checkpoints
     checkpoints.forEach((cp, index) => {
         if (isJumping) return; // Ignora se já estiver a saltar
-        if (checkpointsVisitados.has(index)) return;
 
         if (Math.abs(frog.position.x - cp.position.x) < 1 && Math.abs(frog.position.z - cp.position.z) < 1) {
+            if (checkpointsVisitados.has(index)) {
+                handleLose();
+                return;
+            }
             checkpointsVisitados.add(index);
             score++;
             updateScore();
 
             cp.material.color.set(0xffff00);
-
+            let frogCopy = frog.clone(true);
+            frogCopy.position.copy(cp.position);
+            currentScene.add(frogCopy);
 
             // Tocar som do checkpoint
             checkpointSound.currentTime = 0;
@@ -443,7 +448,7 @@ function checkCollisions() {
                 setTimeout(() => {
                     showMainMenu(); // <- volta ao menu após mais 2 segundos
                 }, 2000);
-    }, 100);
+    });
 }
 
         }
