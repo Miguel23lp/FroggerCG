@@ -1,4 +1,7 @@
-import { createFrog, createCar, createLog, createWater, createVan } from './objects.js';
+import { createFrog, createCar, createLog, createWater, createVan, createExplosion } from './objects.js';
+
+
+const clock = new THREE.Clock();
 
 const jumpDuration = 0.1; // Duração do salto em segundos
 const jumpHeight = 1; // Altura do salto em unidades de jogo
@@ -11,6 +14,9 @@ let currentCamera;
 let currentScene;
 let gameState;
 let frog;
+let frogAnimation;
+let idleAnimation;
+let deathAnimation;
 let isJumping;
 let lanes;
 let lives;
@@ -195,7 +201,12 @@ export function initGame(scene, camera) {
     currentCamera = camera;
     
     gameState = 'Play';
-    frog = createFrog();
+    let {group, mixer, idleAction, deathAction} = createFrog();
+    frog = group;
+    frogAnimation = mixer;
+    idleAnimation = idleAction;
+    deathAnimation = deathAction;
+
     currentScene.add(frog);
     isJumping = false;
     lanes = [];
@@ -335,6 +346,8 @@ function respawnPlayer() {
     clearLanes();
     createLanes();
     
+    deathAnimation.reset().stop();
+    idleAnimation.reset().play();
     frog.position.set(0, 0, 11);
     frog.rotation.y = 0;
     currentCamera.position.set(0, 6, 12);
@@ -342,6 +355,8 @@ function respawnPlayer() {
 }
 
 export function gameLoop() {
+    const delta = clock.getDelta();
+    frogAnimation.update(delta);
     if (gameState !== 'Play') {
         return; // Stop game updates while dead
     }
@@ -420,6 +435,7 @@ function checkCollisions() {
 
             // Verificar se todos os checkpoints foram visitados (ganhar)
             if (checkpointsVisitados.size === checkpoints.length) {
+                // Ganhou
                 setTimeout(() => {
                 winSound.currentTime = 0;
                 winSound.play();
@@ -438,11 +454,13 @@ function checkCollisions() {
 
 function handleLose() {
     console.log("💥 Game Over!");
+    deathAnimation.reset().play();
     lives--;
     updateLives();
     loseSound.currentTime = 0;
     loseSound.play();
     if (lives <= 0) {
+        createExplosion(frog.position, currentScene);
         gameState = 'Game Over';
         showMessage('Game Over!\nPress Space to restart');
            setTimeout(() => {

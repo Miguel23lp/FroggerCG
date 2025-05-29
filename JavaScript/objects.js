@@ -1,3 +1,4 @@
+
 export function createFrog() {
     const group = new THREE.Group();
 
@@ -56,9 +57,34 @@ export function createFrog() {
         foot.receiveShadow = true;
         group.add(foot);
     }
+    
+    // Animation setup
+    const mixer = new THREE.AnimationMixer(group);
 
-    return group;
+    // === Idle Animation ===
+    const idleTimes = [0, 1, 2];
+    const idleValues = [
+        0, 0.3, 0,
+        0, 0.32, 0,
+        0, 0.3, 0
+    ];
+    const idleTrack = new THREE.VectorKeyframeTrack('.children[0].position', idleTimes, idleValues);
+    const idleClip = new THREE.AnimationClip('idle', -1, [idleTrack]);
+    const idleAction = mixer.clipAction(idleClip);
+    idleAction.play();
+
+    // === Death Animation ===
+    const deathDuration = 1;
+    const spinTrack = new THREE.NumberKeyframeTrack('.rotation[y]', [0, deathDuration], [0, Math.PI * 4]);
+    const scaleTrack = new THREE.VectorKeyframeTrack('.scale', [0, deathDuration], [1, 1, 1, 0, 0, 0]);
+    const deathClip = new THREE.AnimationClip('death', deathDuration, [spinTrack, scaleTrack]);
+    const deathAction = mixer.clipAction(deathClip);
+    deathAction.setLoop(THREE.LoopOnce);
+    deathAction.clampWhenFinished = true;
+
+    return { group, mixer, idleAction, deathAction };
 }
+
 
 export function createCar() {
     const group = new THREE.Group();
@@ -273,4 +299,58 @@ export function createWater() {
     return water;
 }
 
+export function createExplosion(position, scene) {
+    const particleCount = 100;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = [];
+
+    for (let i = 0; i < particleCount; i++) {
+        // Start at origin (will be positioned later)
+        positions[i * 3] = 0;
+        positions[i * 3 + 1] = 0;
+        positions[i * 3 + 2] = 0;
+
+        // Random velocity for each particle
+        velocities.push(new THREE.Vector3(
+            (Math.random() - 0.5) * 2,
+            Math.random() * 2,
+            (Math.random() - 0.5) * 2
+        ));
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const material = new THREE.PointsMaterial({
+        color: 0xffaa00,
+        size: 0.1
+    });
+
+    const particles = new THREE.Points(geometry, material);
+    particles.position.copy(position);
+    scene.add(particles);
+
+    // Animate particles
+    const startTime = performance.now();
+    function updateParticles() {
+        const elapsed = (performance.now() - startTime) / 1000;
+
+        const pos = geometry.attributes.position.array;
+        for (let i = 0; i < particleCount; i++) {
+            const v = velocities[i];
+            pos[i * 3] += v.x * 0.02;
+            pos[i * 3 + 1] += v.y * 0.02 - elapsed * 0.02; // gravity
+            pos[i * 3 + 2] += v.z * 0.02;
+        }
+        geometry.attributes.position.needsUpdate = true;
+
+        if (elapsed < 2) {
+            requestAnimationFrame(updateParticles);
+        } else {
+            scene.remove(particles);
+        }
+    }
+
+    updateParticles();
+}
 

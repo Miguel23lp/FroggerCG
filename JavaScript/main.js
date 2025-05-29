@@ -103,7 +103,7 @@ function animate(now) {
 
     if (delta > interval) {
         then = now - (delta % interval); // corrige o tempo acumulado
-        gameLoop();
+        gameLoop(delta);
         renderer.render(scene, camera);
     }
 }
