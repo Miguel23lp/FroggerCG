@@ -131,22 +131,52 @@ export function createVan() {
     const group = new THREE.Group();
     
     const bodyColor = 0xcccccc;
-    const bumperColor = 0x333333;
     const windowColor = 0x111111;
 
     // Corpo principal
     const body = new THREE.Mesh(
-        new THREE.BoxGeometry(3.2, 1.6, 1.2),
+        new THREE.BoxGeometry(3.2, 1.2, 1.2),
         new THREE.MeshStandardMaterial({ color: bodyColor })
     );
-    body.position.set(0, 0.8, 0);
+    body.position.set(0, 1, 0);
     group.add(body);
 
     // Frontal
-    const hood = new THREE.Mesh(
+    let hood = new THREE.Group();
+    const hoodGeometry = new THREE.Mesh(
         new THREE.BoxGeometry(1.0, 0.5, 1.2),
         new THREE.MeshStandardMaterial({ color: bodyColor })
     );
+    hood.add(hoodGeometry);
+
+    // Headlights
+    const headlightGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+    const headlightMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00 });
+    const headlight1 = new THREE.Mesh(headlightGeometry, headlightMaterial);
+    headlight1.position.set(2.1, 0.5, 0.4);
+
+    const headlight2 = new THREE.Mesh(headlightGeometry, headlightMaterial);
+    headlight2.position.set(2.1, 0.5, -0.4);
+
+
+    const headlightSpotLight1 = new THREE.SpotLight(0xffff00, 3, 7, Math.PI / 5, 0.7, 1);
+    headlight1.add(headlightSpotLight1);
+    headlight1.add(headlightSpotLight1.target);
+    headlightSpotLight1.position.set(0, 0, 0);
+    headlightSpotLight1.target.position.set(1, -0.3, 0);
+    //headlightSpotLight1.castShadow = true;
+
+    const headlightSpotLight2 = new THREE.SpotLight(0xffff00, 3, 7, Math.PI / 5, 0.7, 1);
+    headlight2.add(headlightSpotLight2);
+    headlight2.add(headlightSpotLight2.target);
+    headlightSpotLight2.position.set(0, 0, 0);
+    headlightSpotLight2.target.position.set(1, -0.3, 0);
+    //headlightSpotLight2.castShadow = true;
+
+    //headlight1.receiveShadow = true;
+    //headlight2.receiveShadow = true;
+    hood.add(headlight1, headlight2);
+
     hood.position.set(1.6, 0.55, 0);
     hood.rotation.x = -0.08;
     group.add(hood);    
@@ -175,18 +205,23 @@ export function createVan() {
     ];
 
     wheelPositions.forEach(([x, y, z]) => {
-    const wheelGroup = new THREE.Group();
+        const wheelGroup = new THREE.Group();
 
-    const tire = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.25, 0.25, 0.1, 32),
-    new THREE.MeshStandardMaterial({ color: 0x000000 })
-    );
-    tire.rotation.x = Math.PI / 2;
-    wheelGroup.add(tire);
+        const tire = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.25, 0.25, 0.1, 32),
+        new THREE.MeshStandardMaterial({ color: 0x000000 })
+        );
+        tire.rotation.x = Math.PI / 2;
+        wheelGroup.add(tire);
 
-    wheelGroup.position.set(x, y, z);
-    group.add(wheelGroup);
+        wheelGroup.position.set(x, y, z);
+
+        
+        group.add(wheelGroup);
     });
+
+    
+    group.add(headlight1, headlight2);
 
     return group;
 }
