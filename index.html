@@ -1,28 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Frogger 3D</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
     <!-- MENU INICIAL -->
-    <div id="menu">
-        <h1>Frogger 3D</h1>
-        <button id="startBtn">Iniciar Jogo</button>
+    <div id="menu" role="dialog" aria-modal="true" aria-labelledby="gameTitle">
+        <h1 id="gameTitle">Frogger 3D</h1>
+        <button id="startBtn" type="button" aria-label="Iniciar Jogo">Iniciar Jogo</button>
     </div>
 
     <!-- Controlo de volume -->
-    <div style="position: absolute; top: 20px; right: 20px; color: white;">
-        <label for="volumeControl" style="color: white; display: block; margin-top: 20px;">Volume:</label>
-        <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.4" style="width: 200px;">
+    <div style="position: absolute; top: 20px; right: 20px; z-index: 10; color: white;">
+        <label for="volumeControl" style="display: block;">Volume:</label>
+        <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.4" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.4" aria-label="Controle de volume" />
+    </div>
+
+    <!-- Botão de Ligar/Desligar Luzes -->
+    <div style="position: absolute; top: 80px; right: 20px; z-index: 10;">
+        <button button id="toggleAmbientBtn" aria-label="Ligar/Desligar Luz Ambiente">💡 Luz Ambiente</button>
+        <button id="toggleDirectionalBtn" aria-label="Ligar/Desligar Luz Direcional">🔦 Luz Direcional</button>
+    </div>
+    <!-- Botão para alternar entre câmaras -->
+    <div style="position: absolute; top: 120px; right: 20px; z-index: 10;">
+        <button id="toggleCameraBtn">📷 Alternar Câmara</button>
     </div>
 
     <!-- SCRIPTS -->
     <script src="./JavaScript/three.js"></script>
     <script type="module" src="JavaScript/main.js"></script>
+
 </body>
 </html>

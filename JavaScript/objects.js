@@ -192,12 +192,42 @@ export function createVan() {
 }
 
 export function createLog() {
-    const geometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 32);
-    const material = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-    const log = new THREE.Mesh(geometry, material);
-    log.rotation.z = Math.PI / 2; // Roda o tronco para ficar na horizontal
-    return log;
+    const logGroup = new THREE.Group();
+    const textureLoader = new THREE.TextureLoader();
+
+    // Carregar textura de madeira
+    const woodTexture = textureLoader.load('textures/wood_log.jpg');
+
+    // Repetição opcional da textura para alongar a imagem
+    woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
+    woodTexture.repeat.set(2, 1);
+
+    // Material com textura
+    const material = new THREE.MeshStandardMaterial({ map: woodTexture });
+
+    // Tronco principal
+    const mainGeometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 32);
+    const mainLog = new THREE.Mesh(mainGeometry, material);
+    mainLog.rotation.z = Math.PI / 2;
+    logGroup.add(mainLog);
+
+    // Função para criar ramos
+    function createBranch(position, rotation) {
+        const branchGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.8, 16);
+        const branch = new THREE.Mesh(branchGeometry, material);
+        branch.position.set(position.x, position.y, position.z);
+        branch.rotation.set(rotation.x, rotation.y, rotation.z);
+        logGroup.add(branch);
+    }
+
+    // Adicionar ramos
+    createBranch(new THREE.Vector3(0.5, 0.3, 0), new THREE.Euler(0, 0, Math.PI / 4));
+    createBranch(new THREE.Vector3(-0.8, -0.2, 0), new THREE.Euler(0, 0, -Math.PI / 4));
+    createBranch(new THREE.Vector3(0, 0, 0.5), new THREE.Euler(Math.PI / 4, 0, 0));
+
+    return logGroup;
 }
+
 
 export function createWater() {
     const geometry = new THREE.PlaneGeometry(100, 9);
