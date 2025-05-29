@@ -1,4 +1,5 @@
-import { createFrog, createCar, createLog, createWater } from './objects.js';
+import { createFrog, createCar, createLog, createWater, createRoadLane } from './objects.js';
+
 
 const jumpDuration = 0.1; // Duração do salto em segundos
 const jumpHeight = 1; // Altura do salto em unidades de jogo
@@ -158,6 +159,10 @@ function createLanes() {
 
     // Adicionar objetos às faixas
     lanes.forEach(lane => {
+    if (lane.type === 'car') {
+        const road = createRoadLane(lane.z); // ← adicionar plano da estrada
+        currentScene.add(road);
+    }
         for (let i = 0; i < 6; i++) {
             const obj = lane.type === 'car' ? createCar() : createLog();
             const minX = -25;

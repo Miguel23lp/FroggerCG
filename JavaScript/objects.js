@@ -3,7 +3,13 @@ export function createFrog() {
 
     // Body
     const bodyGeometry = new THREE.BoxGeometry(1, 0.6, 1);
-    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 }); // Verde mais "realista"
+
+    const textureLoader = new THREE.TextureLoader();
+    const frogTexture = textureLoader.load('textures/frog.jpg');
+
+    const bodyMaterial = new THREE.MeshStandardMaterial({ map: frogTexture });
+
+
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
     body.position.set(0, 0.3, 0);
     body.castShadow = true;
@@ -165,12 +171,45 @@ export function createLog() {
 
 
 export function createWater() {
+    const textureLoader = new THREE.TextureLoader();
+    const riverTexture = textureLoader.load('textures/river.jpg'); // ajusta o caminho se necessário
+
+    // Faz com que a textura se repita ao longo do plano
+    riverTexture.wrapS = THREE.RepeatWrapping;
+    riverTexture.wrapT = THREE.RepeatWrapping;
+    riverTexture.repeat.set(5, 1); // aumenta horizontalmente (x) se quiseres mais repetições
+
     const geometry = new THREE.PlaneGeometry(100, 9);
-    const material = new THREE.MeshStandardMaterial({ color: 0x1E90FF, transparent: true, opacity: 0.5 });
+    const material = new THREE.MeshStandardMaterial({
+        map: riverTexture,
+        transparent: true,
+        opacity: 0.9,
+    });
+
     const water = new THREE.Mesh(geometry, material);
-    water.rotation.x = -Math.PI / 2; // Roda o plano para ficar na horizontal
-    water.position.y = 0.1; // Eleva o plano um pouco acima do chão
+    water.rotation.x = -Math.PI / 2;
+    water.position.y = 0.1;
+    water.receiveShadow = true;
+
     return water;
 }
+export function createRoadLane(z) {
+    const textureLoader = new THREE.TextureLoader();
+    const roadTexture = textureLoader.load('textures/road.jpg');
 
+    roadTexture.wrapS = THREE.RepeatWrapping;
+    roadTexture.wrapT = THREE.RepeatWrapping;
+    roadTexture.repeat.set(1, 5); // se precisares de repetir no novo eixo
+    roadTexture.center.set(0.5, 0.5);    // centro da textura
+    roadTexture.rotation = Math.PI / 2;  // 90 graus
 
+    const geometry = new THREE.PlaneGeometry(100, 2);
+    const material = new THREE.MeshStandardMaterial({ map: roadTexture });
+
+    const road = new THREE.Mesh(geometry, material);
+    road.rotation.x = -Math.PI / 2;
+    road.position.set(0, 0.101, z);
+    road.receiveShadow = true;
+
+    return road;
+}
