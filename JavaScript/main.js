@@ -7,6 +7,12 @@ let backgroundMusic;
 
 let volume = 0.5; // volume inicial padrão
 
+let ambientLight;
+let directionalLight;
+let ambientOn = true;
+let directionalOn = true;
+
+
 
 const targetFPS = 30;
 const interval = 1000 / targetFPS; // em ms
@@ -27,10 +33,10 @@ function iniciarJogo() {
     renderer.domElement.style.zIndex = '0';
 
     // LUZES
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(1, 1, 1);
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = 1024;
@@ -75,6 +81,22 @@ window.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.getElementById('startBtn');
     const menu = document.getElementById('menu');
     const volumeControl = document.getElementById('volumeControl');
+
+    const toggleAmbientBtn = document.getElementById('toggleAmbientBtn');
+    const toggleDirectionalBtn = document.getElementById('toggleDirectionalBtn');
+
+    toggleAmbientBtn.addEventListener('click', () => {
+        ambientOn = !ambientOn;
+        if (ambientLight) ambientLight.visible = ambientOn;
+        toggleAmbientBtn.textContent = ambientOn ? "💡 Luz Ambiente Ligada" : "🌑 Luz Ambiente Desligada";
+    });
+
+    toggleDirectionalBtn.addEventListener('click', () => {
+        directionalOn = !directionalOn;
+        if (directionalLight) directionalLight.visible = directionalOn;
+        toggleDirectionalBtn.textContent = directionalOn ? "🔦 Luz Direcional Ligada" : "🌑 Luz Direcional Desligada";
+    });
+
 
     const clickSound = new Audio('sounds/click.wav');
 
