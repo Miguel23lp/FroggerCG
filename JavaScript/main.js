@@ -65,10 +65,10 @@ function iniciarJogo() {
     renderer.domElement.style.zIndex = '0';
 
     // LUZES
-    ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
     scene.add(ambientLight);
 
-    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
     directionalLight.position.set(1, 1, 1);
     directionalLight.castShadow = true;
     directionalLight.shadow.mapSize.width = 1024;
