@@ -38,9 +38,9 @@ let globalVolume = 0.5;
 
 // Create lives display element
 function createLivesDisplay() {
-    const livesElement = document.createElement('div');
+    const livesElement = document.createElement('span');
     livesElement.id = 'lives';
-    livesElement.style.position = 'absolute';
+    livesElement.style.position = 'relative';
     livesElement.style.top = '50px';
     livesElement.style.left = '10px';
     livesElement.style.color = 'red';
@@ -67,11 +67,11 @@ function createLivesDisplay() {
 
 // Create score display element
 function createScoreDisplay() {
-    const scoreElement = document.createElement('div');
+    const scoreElement = document.createElement('span');
     scoreElement.id = 'score';
-    scoreElement.style.position = 'absolute';
+    scoreElement.style.position = 'relative';
     scoreElement.style.top = '10px';
-    scoreElement.style.right = '100px';
+    scoreElement.style.left = '10px';
     scoreElement.style.color = 'white';
     scoreElement.style.fontSize = '32px';
     // Add CSS animation for score
@@ -322,7 +322,10 @@ function resetGame() {
     checkpointsVisitados.clear();
     // Criar os 3 checkpoints (após o rio)
     checkpoints.forEach(checkpoint => {
-        checkpoint.parent.remove(checkpoint);
+        console.log(checkpoint.children);
+        currentScene.remove(...checkpoint.children);
+        checkpoint.remove(...checkpoint.children);
+        currentScene.remove(checkpoint);
     });
     checkpoints = [];
     for (let i = 0; i < 3; i++) {
@@ -331,7 +334,7 @@ function resetGame() {
         const checkpoint = new THREE.Mesh(geometry, material);
         checkpoint.position.set(-13 + i * 13, 0.1, -9);
         checkpoint.receiveShadow = true;
-
+        
         checkpoints.push(checkpoint);
         currentScene.add(checkpoint);
     }
@@ -430,9 +433,11 @@ function checkCollisions() {
             updateScore();
 
             cp.material.color.set(0xffff00);
+
             let frogCopy = frog.clone(true);
-            frogCopy.position.copy(cp.position);
-            currentScene.add(frogCopy);
+            //currentScene.add(frogCopy);
+            frogCopy.position.copy(new THREE.Vector3());
+            cp.add(frogCopy);
 
             // Tocar som do checkpoint
             checkpointSound.currentTime = 0;

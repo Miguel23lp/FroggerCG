@@ -47,23 +47,6 @@ body {
     box-shadow: 0 0 20px #00cc66;
 }
 
-/* Pontuação e Vidas */
-#score, #lives {
-    font-size: 20px;
-    position: absolute;
-    z-index: 10;
-}
-
-#score {
-    top: 10px;
-    left: 10px;
-}
-
-#lives {
-    top: 10px;
-    right: 10px;
-}
-
 #increaseDifficultyBtn {
     display: block;
     margin: 20px 0 0 20px; /* margem só à esquerda e topo */
