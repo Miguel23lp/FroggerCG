@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { createFrog, createCar, createLog, createWater, createVan, createExplosion } from './objects.js';
 
 

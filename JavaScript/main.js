@@ -1,5 +1,5 @@
+import * as THREE from "three";
 import { initGame, gameLoop, setGlobalVolume } from './game.js';
-
 
 let then = performance.now();
 

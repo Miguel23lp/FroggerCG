@@ -32,7 +32,19 @@
     </div>
 
     <!-- SCRIPTS -->
-    <script src="./JavaScript/three.js"></script>
+    
+    <script async="" src="https://unpkg.com/es-module-shims@2.0.10/dist/es-module-shims.js"></script>
+
+    <!-- Aqui especificamos as bibliotecas externas a serem utilizadas pela nossa aplicação-->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.173.0/build/three.module.js"
+        }
+    }
+    </script>
+
+
     <script type="module" src="JavaScript/main.js"></script>
 
 </body>
