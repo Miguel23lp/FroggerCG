@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { initGame, gameLoop, setGlobalVolume } from './game.js';
+import { createRoad } from './objects.js';
 
 let then = performance.now();
 
@@ -16,17 +17,12 @@ let scene, camera, renderer;
 let perspectiveCamera, orthographicCamera;
 let usingPerspective = true;
 
-
-
-
 const targetFPS = 30;
 const interval = 1000 / targetFPS; // em ms
 
 function iniciarJogo() {
     // CENA e RENDERER
     scene = new THREE.Scene();
-
-
     const aspect = window.innerWidth / window.innerHeight;
     const zoomOut = 15; // Aumenta este valor se ainda vires pouco
 
@@ -49,9 +45,6 @@ function iniciarJogo() {
 
 // Começa com a câmara em perspetiva
     camera = perspectiveCamera;
-
-
-
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -82,6 +75,7 @@ function iniciarJogo() {
     scene.add(directionalLight);
 
     // CHÃO
+    /*
     const groundGeometry = new THREE.PlaneGeometry(100, 100);
     const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x5c5c5c });
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
@@ -89,6 +83,14 @@ function iniciarJogo() {
     ground.position.y = 0;
     ground.receiveShadow = true;
     scene.add(ground);
+    */
+
+    let road1 = createRoad();
+    let road2 = createRoad();
+    road1.position.setZ(6);
+    road2.position.setZ(2);
+    scene.add(road1);
+    scene.add(road2);
 
     // INICIAR JOGO
     initGame(scene, camera);
@@ -181,4 +183,7 @@ window.addEventListener('DOMContentLoaded', () => {
             backgroundMusic.volume = volume;
         }
     });
+
+
+    startBtn.click(); // APAGAR
 });

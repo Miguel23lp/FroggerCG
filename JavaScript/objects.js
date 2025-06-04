@@ -354,3 +354,18 @@ export function createExplosion(position, scene) {
     updateParticles();
 }
 
+export function createRoad() {
+    const road = new THREE.PlaneGeometry(50, 4);
+    
+    const textureLoader = new THREE.TextureLoader();
+    const roadTexture = textureLoader.load('textures/road.jpg');
+    roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
+    roadTexture.repeat.set(2, 1);
+    roadTexture.offset.set(0.5, 0);
+    const roadMaterial = new THREE.MeshStandardMaterial({ map: roadTexture });
+    const roadMesh = new THREE.Mesh(road, roadMaterial);
+    roadMesh.rotation.x = -Math.PI / 2;
+    roadMesh.receiveShadow = true;
+    return roadMesh;
+}
+
