@@ -148,7 +148,7 @@ function createLanes() {
             z,
             type: 'car',
             direction: i % 2 === 0 ? 1 : -1, // Direção alternada
-            speed: difficultyMultiplier * Math.random() * (0.1 - 0.075) + 0.075, // Velocidade aleatória entre 0.075 e 0.1
+            speed: difficultyMultiplier * Math.random() * (0.075 - 0.025) + 0.025, // Velocidade aleatória entre 0.025 e 0.75
             elements: [],
         });
     }
@@ -160,7 +160,7 @@ function createLanes() {
             z,
             type: 'log',
             direction: i % 2 === 0 ? -1 : 1, // Direção alternada
-            speed: difficultyMultiplier * Math.random() * (0.1 - 0.075) + 0.075, // Velocidade aleatória entre 0.075 e 0.1
+            speed: difficultyMultiplier * Math.random() * (0.075 - 0.025) + 0.025, // Velocidade aleatória entre 0.025 e 0.75
             elements: [],
         });
     }

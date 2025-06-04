@@ -210,6 +210,4 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
-    startBtn.click(); // APAGAR
 });
