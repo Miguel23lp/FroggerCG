@@ -9,7 +9,9 @@ const jumpHeight = 1; // Altura do salto em unidades de jogo
 const jumpDistance = 2; // Distância do salto em unidades de jogo
 
 const startLives = 3; // Número inicial de vidas
-const difficultyMultiplier = 0.5;
+const difficultyIncrease = 0.5;
+
+let difficultyMultiplier = 1;
 
 let currentCamera;
 let currentScene;
@@ -212,7 +214,7 @@ export function initGame(scene, camera) {
     isJumping = false;
     lanes = [];
     lives = startLives;
-    score = 0;
+    score = 1;
     messageElement = createMessageDisplay();
     livesElement = createLivesDisplay();
     scoreElement = createScoreDisplay();
@@ -226,16 +228,20 @@ export function initGame(scene, camera) {
     respawnPlayer();
 
     document.addEventListener('keydown', (event) => {
-        if (gameState === 'Dead') {
-            if (event.code === 'Space') {
+        if (event.key === ' ') {
+            if (gameState === 'Dead') {
                 respawnPlayer();
                 return;
             }
-        }
 
-        if (gameState === 'Game Over') {
-            if (event.code === 'Space') {// Reiniciar jogo
+            if (gameState === 'Game Over') {
                 resetGame();
+                return;
+                
+            }
+
+            if (gameState === 'Win') {
+                nextLevel();
                 return;
             }
         }
@@ -316,13 +322,24 @@ export function initGame(scene, camera) {
     });
 }
 
+function nextLevel() {
+    difficultyMultiplier += difficultyIncrease;
+    score++;
+    resetLevel();
+    showMessage("Nivel " + score.toString());
+    setTimeout(()=>hideMessage(), 2000);
+}
+
 function resetGame() {
+    score = 1;
+    resetLevel();
+}
+
+function resetLevel() {
     lives = startLives;
-    score = 0;
     checkpointsVisitados.clear();
     // Criar os 3 checkpoints (após o rio)
     checkpoints.forEach(checkpoint => {
-        console.log(checkpoint.children);
         currentScene.remove(...checkpoint.children);
         checkpoint.remove(...checkpoint.children);
         currentScene.remove(checkpoint);
@@ -429,7 +446,6 @@ function checkCollisions() {
                 return;
             }
             checkpointsVisitados.add(index);
-            score++;
             updateScore();
 
             cp.material.color.set(0xffff00);
@@ -447,24 +463,17 @@ function checkCollisions() {
             // Verificar se todos os checkpoints foram visitados (ganhar)
             if (checkpointsVisitados.size === checkpoints.length) {
                 // Ganhou
-                setTimeout(() => {
                 winSound.currentTime = 0;
                 winSound.play();
-                showMessage("🎉 Parabéns! Completaste todos os checkpoints!");
-                setTimeout(() => {
-                    showMainMenu(); // <- volta ao menu após mais 2 segundos
-                }, 2000);
-    });
-}
-
+                showMessage("🎉 Parabéns! Completaste todos os checkpoints!\nPressiona espaço para começar o proximo nível", true);
+                gameState = "Win";
+            }
         }
     });
 }
 
 
-
 function handleLose() {
-    console.log("💥 Game Over!");
     deathAnimation.reset().play();
     lives--;
     updateLives();
@@ -474,9 +483,6 @@ function handleLose() {
         createExplosion(frog.position, currentScene);
         gameState = 'Game Over';
         showMessage('Game Over!\nPress Space to restart');
-           setTimeout(() => {
-            showMainMenu(); // <- volta ao menu
-        }, 2000); // Espera 2 segundos para o jogador ler a mensagem
 
     } else {
         gameState = 'Dead';
@@ -512,9 +518,4 @@ function updateLives() {
 
 function updateScore() {
     scoreElement.textContent = score;
-}
-
-function showMainMenu() {
-    document.getElementById('game-container').style.display = 'none';
-    document.getElementById('main-menu').style.display = 'block';
 }
