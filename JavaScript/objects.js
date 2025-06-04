@@ -62,10 +62,10 @@ export function createFrog() {
     const mixer = new THREE.AnimationMixer(group);
 
     // === Idle Animation ===
-    const idleTimes = [0, 1, 2];
+    const idleTimes = [0, 1.5, 3];
     const idleValues = [
         0, 0.3, 0,
-        0, 0.32, 0,
+        0, 0.35, 0,
         0, 0.3, 0
     ];
     const idleTrack = new THREE.VectorKeyframeTrack('.children[0].position', idleTimes, idleValues);
@@ -285,7 +285,6 @@ export function createLog() {
     createBranch(new THREE.Vector3(0.5, 0.3, 0), new THREE.Euler(0, 0, Math.PI / 4));
     createBranch(new THREE.Vector3(-0.8, -0.2, 0), new THREE.Euler(0, 0, -Math.PI / 4));
     createBranch(new THREE.Vector3(0, 0, 0.5), new THREE.Euler(Math.PI / 4, 0, 0));
-
     return logGroup;
 }
 
@@ -359,13 +358,25 @@ export function createRoad() {
     
     const textureLoader = new THREE.TextureLoader();
     const roadTexture = textureLoader.load('textures/road.jpg');
-    roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
-    roadTexture.repeat.set(2, 1);
-    roadTexture.offset.set(0.5, 0);
+    roadTexture.wrapS = THREE.RepeatWrapping;
+    roadTexture.repeat.set(10, 1);
     const roadMaterial = new THREE.MeshStandardMaterial({ map: roadTexture });
     const roadMesh = new THREE.Mesh(road, roadMaterial);
     roadMesh.rotation.x = -Math.PI / 2;
     roadMesh.receiveShadow = true;
     return roadMesh;
+}
+
+export function createGround() {
+    const ground = new THREE.PlaneGeometry(50, 4);
+    const textureLoader = new THREE.TextureLoader();
+    const groundTexture = textureLoader.load('textures/ground.jpg');
+    groundTexture.wrapT = groundTexture.wrapS = THREE.RepeatWrapping;
+    groundTexture.repeat.set(5, 0.4);
+    const groundMaterial = new THREE.MeshStandardMaterial({ map: groundTexture });
+    const groundMesh = new THREE.Mesh(ground, groundMaterial);
+    groundMesh.rotation.x = -Math.PI / 2;
+    groundMesh.receiveShadow = true;
+    return groundMesh;
 }
 

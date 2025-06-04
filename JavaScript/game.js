@@ -168,16 +168,19 @@ function createLanes() {
     lanes.forEach(lane => {
         for (let i = 0; i < 6; i++) {
             let obj;
+            let y;
             if (lane.type === 'car') {
                 obj = Math.random() < 0.8 ? createCar() : createVan();
+                y = 0.1;
             } else {
                 obj = createLog();
+                y = -0.45;
             }
             const minX = -25;
             const maxX = 25;
             const maxVariation = 2.5;
             const x = (maxX-minX) * (i / 6) + minX;
-            obj.position.set(x + (Math.random()-0.5)*2*maxVariation, 0.1, lane.z);
+            obj.position.set(x + (Math.random()-0.5)*2*maxVariation, y, lane.z);
 
             if (lane.type === 'car' && lane.direction === -1) {
                 obj.rotation.y = Math.PI;
@@ -209,7 +212,6 @@ export function initGame(scene, camera) {
     frogAnimation = mixer;
     idleAnimation = idleAction;
     deathAnimation = deathAction;
-
     currentScene.add(frog);
     isJumping = false;
     lanes = [];
@@ -217,12 +219,7 @@ export function initGame(scene, camera) {
     score = 1;
     messageElement = createMessageDisplay();
     livesElement = createLivesDisplay();
-    scoreElement = createScoreDisplay();
-
-    const water = createWater(); // Criar água na posição z = -1
-    water.position.set(0, 0.1, -4.5); // Ajustar a posição da água
-    currentScene.add(water);
-    
+    scoreElement = createScoreDisplay();    
 
     resetGame();
     respawnPlayer();
@@ -369,7 +366,7 @@ function respawnPlayer() {
     
     deathAnimation.reset().stop();
     idleAnimation.reset().play();
-    frog.position.set(0, 0, 11);
+    frog.position.set(0, 0, 9);
     frog.rotation.y = 0;
     currentCamera.position.set(0, 6, 12);
     currentCamera.lookAt(0, -5, 0);
@@ -442,7 +439,6 @@ function checkCollisions() {
 
         if (Math.abs(frog.position.x - cp.position.x) < 1 && Math.abs(frog.position.z - cp.position.z) < 1) {
             if (checkpointsVisitados.has(index)) {
-                handleLose();
                 return;
             }
             checkpointsVisitados.add(index);
@@ -470,6 +466,10 @@ function checkCollisions() {
             }
         }
     });
+    if (isJumping) return;
+    if (frog.position.z <= -9) {
+        handleLose();    
+    }
 }
 
 

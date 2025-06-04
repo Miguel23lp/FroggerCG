@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { initGame, gameLoop, setGlobalVolume } from './game.js';
-import { createRoad } from './objects.js';
+import { createGround, createRoad, createWater } from './objects.js';
 
 let then = performance.now();
 
@@ -27,7 +27,7 @@ function iniciarJogo() {
     const zoomOut = 15; // Aumenta este valor se ainda vires pouco
 
     // Câmara em perspetiva
-    perspectiveCamera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+    perspectiveCamera = new THREE.PerspectiveCamera(60, aspect, 0.1, 1000);
     perspectiveCamera.position.set(0, 6, 12);
     perspectiveCamera.lookAt(0, -5, 0);
 
@@ -84,13 +84,39 @@ function iniciarJogo() {
     ground.receiveShadow = true;
     scene.add(ground);
     */
+   
+    let ground1 = createGround();
+   ground1.position.setZ(10);
 
     let road1 = createRoad();
     let road2 = createRoad();
     road1.position.setZ(6);
     road2.position.setZ(2);
-    scene.add(road1);
-    scene.add(road2);
+
+    const water = createWater(); // Criar água na posição z = -1
+    water.position.set(0, 0.01, -4.5); // Ajustar a posição da água
+
+    let ground2 = createGround();
+    ground2.position.setZ(-2);
+    ground2.position.setY(-2);
+    let ground3 = createGround();
+    ground3.position.setZ(-6);
+    ground3.position.setY(-2);
+    let ground4 = createGround();
+    ground4.position.setZ(-10);
+    ground4.position.setY(-2);
+
+    let ground5 = createGround();
+    ground5.position.setZ(-10);
+    let ground6 = createGround();
+    ground6.position.setZ(-14);
+
+    let ground7 = createGround();
+    ground7.position.setZ(-10);
+    ground7.position.setY(-1.8);
+    ground7.rotateX(90);
+
+    scene.add(road1, road2, ground1, ground2, ground3, ground4, ground5, ground6, ground7, water);
 
     // INICIAR JOGO
     initGame(scene, camera);
