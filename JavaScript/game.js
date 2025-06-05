@@ -10,6 +10,8 @@ const jumpDistance = 2; // Distância do salto em unidades de jogo
 
 const startLives = 3; // Número inicial de vidas
 const difficultyIncrease = 0.5;
+const minX = -25;
+const maxX = 25;
 
 let difficultyMultiplier = 1;
 
@@ -176,8 +178,6 @@ function createLanes() {
                 obj = createLog();
                 y = -0.45;
             }
-            const minX = -25;
-            const maxX = 25;
             const maxVariation = 2.5;
             const x = (maxX-minX) * (i / 6) + minX;
             obj.position.set(x + (Math.random()-0.5)*2*maxVariation, y, lane.z);
@@ -383,10 +383,10 @@ export function gameLoop() {
         lane.elements.forEach(obj => {
             obj.position.x += lane.speed * lane.direction;
 
-            if (lane.direction === 1 && obj.position.x > 25) {
-                obj.position.x = -25;
-            } else if (lane.direction === -1 && obj.position.x < -25) {
-                obj.position.x = 25;
+            if (lane.direction === 1 && obj.position.x > maxX) {
+                obj.position.x = minX;
+            } else if (lane.direction === -1 && obj.position.x < minX) {
+                obj.position.x = maxX;
             }
         });
     });
@@ -432,6 +432,10 @@ function checkCollisions() {
             }
         }
     });
+    if (frog.position.x >= maxX || frog.position.x <= minX){
+        handleLose();
+        return;
+    } 
 
     // Verificar checkpoints
     checkpoints.forEach((cp, index) => {
@@ -469,7 +473,9 @@ function checkCollisions() {
     if (isJumping) return;
     if (frog.position.z <= -9) {
         handleLose();    
+        return;
     }
+    
 }
 
 
