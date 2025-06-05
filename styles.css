@@ -47,39 +47,6 @@ body {
     box-shadow: 0 0 20px #00cc66;
 }
 
-#increaseDifficultyBtn {
-    display: block;
-    margin: 20px 0 0 20px; /* margem só à esquerda e topo */
-    padding: 10px 25px;     /* ligeiramente menor */
-    font-size: 16px;        /* fonte menor */
-    background: linear-gradient(45deg, #00cc66, #00994d);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    box-shadow: 0 0 12px #00cc66;
-    transition: background 0.3s ease, box-shadow 0.3s ease;
-    font-weight: 600;
-    width: auto;            /* largura automática */
-    text-align: center;
-    user-select: none;
-    position: absolute;
-    top: 60px;              /* um pouco abaixo das vidas */
-    left: 20px;             /* à esquerda com margem */
-    z-index: 20;            /* acima da cena */
-}
-
-#increaseDifficultyBtn:hover {
-    background: linear-gradient(45deg, #00994d, #007a33);
-    box-shadow: 0 0 20px #00ff99;
-}
-
-#increaseDifficultyBtn:active {
-    background: linear-gradient(45deg, #007a33, #005522);
-    box-shadow: 0 0 10px #00994d;
-    transform: scale(0.98);
-}
-
 #volumeControl {
     width: 120px;
     height: 6px;
