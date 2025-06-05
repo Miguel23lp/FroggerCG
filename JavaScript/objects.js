@@ -358,7 +358,7 @@ export function createRoad() {
     
     const textureLoader = new THREE.TextureLoader();
     const roadTexture = textureLoader.load('textures/road.jpg');
-    roadTexture.wrapS = THREE.RepeatWrapping;
+    roadTexture.wrapS = THREE.MirroredRepeatWrapping;
     roadTexture.repeat.set(10, 1);
     const roadMaterial = new THREE.MeshStandardMaterial({ map: roadTexture });
     const roadMesh = new THREE.Mesh(road, roadMaterial);
@@ -371,7 +371,7 @@ export function createGround() {
     const ground = new THREE.PlaneGeometry(50, 4);
     const textureLoader = new THREE.TextureLoader();
     const groundTexture = textureLoader.load('textures/ground.jpg');
-    groundTexture.wrapT = groundTexture.wrapS = THREE.RepeatWrapping;
+    groundTexture.wrapT = groundTexture.wrapS = THREE.MirroredRepeatWrapping;
     groundTexture.repeat.set(5, 0.4);
     const groundMaterial = new THREE.MeshStandardMaterial({ map: groundTexture });
     const groundMesh = new THREE.Mesh(ground, groundMaterial);
